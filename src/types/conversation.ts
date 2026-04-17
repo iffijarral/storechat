@@ -1,3 +1,11 @@
+export type ConversationStatus = 
+  | "active" 
+  | "pending_human" 
+  | "active_human" 
+  | "resolved" 
+  | "ended"
+  | "closed";
+
 export interface MessageResponse {
   id: string;
   role: "user" | "assistant" | "system";
@@ -16,7 +24,7 @@ export interface ConversationSummaryResponse {
   intent?: string | null;
   total_messages: number;
   tokens_used: number;
-  status: "active" | "closed" | "pending";
+  status: ConversationStatus;
   started_at: string;
   last_message_at: string;
 }

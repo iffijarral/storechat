@@ -1,11 +1,20 @@
-import type { NextConfig } from "next";
+import { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // Allow all for now, narrow it down later
+      },
+    ],
+  },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://127.0.0.1:8000/api/:path*', // Your FastAPI URL
+        destination: 'http://backend:8000/api/:path*', // Your FastAPI URL
       },
     ];
   },

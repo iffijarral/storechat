@@ -1,23 +1,32 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
-import { DashboardOverview } from "@/components/dashboard/overview";
-import { LandingPage } from "@/components/marketing/landing-page";
+import { useState } from "react";
 import { LoadingScreen } from "@/components/ui/loading-screen";
+import { LandingPage } from "@/components/marketing/landing-page";
+import { useAuthStore } from "@/store/authStore";
+// Import your Dashboard files
+import DashboardLayout from "./(dashboard)/layout";
+import DashboardPage from "./(dashboard)/page";
+import { StoreConfigView } from "@/components/dashboard/storeConfig";
+import { ConversationsView } from "@/components/dashboard/conversations/ConversationsView";
+import { ProfileView } from "@/components/dashboard/profile/ProfileView";
 
 export default function RootPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useAuthStore(); 
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // 1. Prevent "Flash of Unstyled Content" (FOUC)
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  if (isLoading) return <LoadingScreen />;
 
-  // 2. If Logged In -> Show Dashboard
   if (user) {
-    return <DashboardOverview />;
+    return (
+      <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+        {activeTab === "overview" && <DashboardPage />}
+        {activeTab === "storeConfig" && <StoreConfigView />}
+        {activeTab === "conversations" && <ConversationsView />}
+        {activeTab === "profile" && <ProfileView />}
+      </DashboardLayout>
+    );
   }
 
-  // 3. If Guest -> Show Marketing/Landing Page
   return <LandingPage />;
 }

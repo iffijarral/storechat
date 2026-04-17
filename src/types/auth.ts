@@ -1,3 +1,5 @@
+import { StoreBase } from "./store";
+
 export interface UserBase {
   email: string;
   name?: string | null;
@@ -7,6 +9,7 @@ export interface UserResponse extends UserBase {
   id: string; // UUID
   is_active: boolean;
   created_at: string; // ISO DateTime
+  stores: StoreBase[];
 }
 
 export interface RegisterRequest extends UserBase {

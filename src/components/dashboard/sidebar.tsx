@@ -1,54 +1,36 @@
+// components/dashboard/sidebar.tsx
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Settings, 
-  Store, 
-  BarChart3,
-  Bot
-} from "lucide-react";
+import { LayoutDashboard, MessageSquare, Bot, Store, BarChart3, UserCircle } from "lucide-react";
 
 const navigation = [
-  { name: "Overview", href: "/", icon: LayoutDashboard },
-  { name: "Conversations", href: "/conversations", icon: MessageSquare },
-  { name: "Bot Settings", href: "/bot-settings", icon: Bot },
-  { name: "Store Config", href: "/store-config", icon: Store },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Overview", id: "overview", icon: LayoutDashboard },
+  { name: "Conversations", id: "conversations", icon: MessageSquare },
+  // { name: "Bot Settings", id: "bot-settings", icon: Bot },
+  { name: "Store Config", id: "storeConfig", icon: Store },
+  { name: "Analytics", id: "analytics", icon: BarChart3 },
+  { name: "Profile", id: "profile", icon: UserCircle },
 ];
 
-export function Sidebar() {
-  const pathname = usePathname();
-
+export function Sidebar({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (id: string) => void }) {
   return (
-    <div className="hidden lg:flex h-full w-64 flex-col bg-white dark:bg-zinc-950 border-r">
-      <div className="flex h-16 items-center px-6 border-b">
-        <span className="text-xl font-bold tracking-tight text-primary">StoreChat</span>
-      </div>
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                isActive 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-zinc-900 hover:text-foreground"
-              )}
-            >
-              <item.icon className={cn("mr-3 h-5 w-5", isActive ? "text-primary" : "text-muted-foreground")} />
-              {item.name}
-            </Link>
-          );
-        })}
+    <aside className="w-64 border-r bg-white dark:bg-zinc-950">
+      <nav className="p-4 space-y-1">
+        {navigation.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`flex w-full items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === item.id 
+              ? "bg-primary text-primary-foreground" 
+              : "text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-900"
+            }`}
+          >
+            <item.icon className="w-4 h-4" />
+            {item.name}
+          </button>
+        ))}
       </nav>
-    </div>
+    </aside>
   );
 }

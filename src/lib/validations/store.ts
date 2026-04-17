@@ -20,7 +20,7 @@ export const generalSettingsSchema = storeSchema.pick({
 });
 
 
-
+ 
 /**
  * 2. The Partial Schema (The "Contract" for Settings/Updates)
  * .partial() makes all keys in storeSchema optional.

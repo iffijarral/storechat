@@ -48,12 +48,15 @@ export interface StoreRegistrationRequest {
   woo_consumer_secret: string;
 }
 
-export interface StoreResponse {
-  id: string; // UUID
-  store_id: string;
-  store_name: string;
+export interface StoreResponse extends StoreBase {  
   store_url: string;
   owner_id: string;
   is_active: boolean;
   created_at: string;
+}
+
+export interface StoreBase {
+  id: string; // UUID
+  store_id: string;
+  store_name: string;
 }
