@@ -23,6 +23,7 @@ export interface LoginRequest {
 
 export interface TokenResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
   user: UserResponse;
 }
@@ -44,4 +45,13 @@ export interface UnifiedSignupRequest {
   store_url: string;
   woo_consumer_key: string;
   woo_consumer_secret: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  new_password: string;
 }

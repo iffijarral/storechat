@@ -1,159 +1,148 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+// components/dashboard/ProfileView.tsx
+
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Eye, EyeOff, Loader2, User, Key, Save } from "lucide-react";
-import { toast } from "sonner";
+import { Loader2, User, Key, Mail, CheckCircle2 } from "lucide-react";
 import { useUpdateName } from "@/hooks/user/useUpdateName";
+import ChangePasswordForm from "@/components/auth/ChangePassword";
 
 export function ProfileView() {
   const { user } = useAuthStore();
-  
-  // States
   const [fullName, setFullName] = useState(user?.name ?? "");
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+  const [nameSaved, setNameSaved] = useState(false); 
 
-  // Initials for Avatar
-  const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-
-  // Mutations (Stubs)
   const updateNameMutation = useUpdateName();
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: async () => {
-      if (passwordForm.newPassword !== passwordForm.confirmPassword) throw new Error("Passwords mismatch");
-      await new Promise((r) => setTimeout(r, 800)); // API logic here
-    },
-    onSuccess: () => {
-      toast.success("Password updated");
-      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    },
-    onError: (err: { message: string }) => toast.error(err.message),
-  });
+  const handleSaveName = () => {
+    updateNameMutation.mutate(
+      { name: fullName },
+      {
+        onSuccess: () => {
+          setNameSaved(true);
+          setTimeout(() => setNameSaved(false), 3000);
+        },
+      },
+    );
+  };
+
+  const nameUnchanged = fullName.trim() === (user?.name ?? "").trim();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 p-6">
+    <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Account Settings</h1>
-        <p className="text-muted-foreground">Manage your public profile and security preferences.</p>
+        <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Account Settings
+        </h1>
+        <p className="text-sm text-slate-400 mt-1">
+          Manage your profile and security preferences.
+        </p>
       </div>
 
-      <div className="grid gap-8">
-        {/* ─── Profile Section ─── */}
+      <div className="grid gap-6">
+
+        {/* ── Profile Card ── */}
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
-          <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-            {/* <Avatar className="w-16 h-16 border-2 border-violet-100 dark:border-violet-900">
-              <AvatarFallback className="bg-violet-600 text-white text-xl font-bold">
-                {initials}
-              </AvatarFallback>
-            </Avatar> */}
-            <div>
-              <CardTitle>Public Profile</CardTitle>
-              <CardDescription>This is how other admins will see your name.</CardDescription>
-            </div>
+          <CardHeader>
+            <CardTitle className="text-base">Public Profile</CardTitle>
+            <CardDescription>
+              This is how other admins will identify you.
+            </CardDescription>
           </CardHeader>
           <Separator />
-          <CardContent className="pt-6">
-            <div className="space-y-4 max-w-md">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                  <Input 
-                    id="name" 
-                    value={fullName} 
-                    onChange={(e) => setFullName(e.target.value)} 
-                    className="pl-10"
-                  />
-                </div>
+          <CardContent className="pt-6 space-y-4">
+
+            {/* Email — read only */}
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Email
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  id="email"
+                  value={user?.email ?? ""}
+                  readOnly
+                  className="pl-10 bg-slate-50 dark:bg-slate-900 text-slate-500 cursor-not-allowed"
+                />
               </div>
-              <Button 
-                onClick={() => updateNameMutation.mutate({ name: fullName })}
-                disabled={updateNameMutation.isPending || fullName === user?.name}
-                className="bg-violet-600 hover:bg-violet-700"
-              >
-                {updateNameMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Save Changes
-              </Button>
+              <p className="text-[11px] text-slate-400">Email cannot be changed.</p>
             </div>
+
+            {/* Full name */}
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Full Name
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  id="name"
+                  value={fullName}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    setNameSaved(false);
+                  }}
+                  className="pl-10"
+                  placeholder="Your full name"
+                />
+              </div>
+            </div>
+
+            {/* Save button + inline success */}
+            <div className="flex items-center gap-3 pt-1">
+              <Button
+                onClick={handleSaveName}
+                disabled={updateNameMutation.isPending || nameUnchanged}
+                className="w-full sm:w-auto"
+              >
+                {updateNameMutation.isPending
+                  ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving…</>
+                  : "Save Changes"}
+              </Button>
+
+              {nameSaved && (
+                <span className="flex items-center gap-1.5 text-sm text-emerald-600 font-medium animate-in fade-in slide-in-from-left-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Saved
+                </span>
+              )}
+
+              {updateNameMutation.isError && (
+                <span className="text-sm text-red-500">
+                  Failed to save. Try again.
+                </span>
+              )}
+            </div>
+
           </CardContent>
         </Card>
 
-        {/* ─── Security Section ─── */}
+        {/* ── Security Card ── */}
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Key className="w-5 h-5 text-violet-600" />
-              <CardTitle>Password</CardTitle>
+              <Key className="w-4 h-4 text-slate-500" />
+              <CardTitle className="text-base">Password</CardTitle>
             </div>
-            <CardDescription>Change your password to keep your account secure.</CardDescription>
+            <CardDescription>
+              After changing your password you will be signed out of all sessions.
+            </CardDescription>
           </CardHeader>
           <Separator />
           <CardContent className="pt-6">
-            <div className="space-y-6 max-w-md">
-              <div className="space-y-2">
-                <Label htmlFor="current">Current Password</Label>
-                <div className="relative">
-                  <Input 
-                    id="current" 
-                    type={showCurrent ? "text" : "password"} 
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                  />
-                  <button 
-                    onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
-                  >
-                    {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="new">New Password</Label>
-                  <Input 
-                    id="new" 
-                    type="password" 
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm">Confirm New</Label>
-                  <Input 
-                    id="confirm" 
-                    type="password" 
-                    value={passwordForm.confirmPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              <Button 
-                onClick={() => updatePasswordMutation.mutate()}
-                disabled={updatePasswordMutation.isPending || !passwordForm.newPassword}
-                variant="outline"
-                className="border-violet-200 hover:bg-violet-50 dark:hover:bg-violet-950"
-              >
-                {updatePasswordMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Update Password
-              </Button>
-            </div>
+            <ChangePasswordForm />
           </CardContent>
         </Card>
+
       </div>
     </div>
   );

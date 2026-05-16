@@ -15,7 +15,7 @@ import { storeSchema, type StoreValues } from "@/lib/validations/store";
 interface StoreStepProps {
   defaultValues?: Partial<StoreValues>;
   onSubmit: (data: StoreValues) => Promise<void>;
-  onBack: () => void;
+  onBack?: () => void;
   isLoading: boolean;
   error: string | null;
 }
@@ -154,15 +154,17 @@ export function StoreStep({
       )}
 
       <div className="flex gap-3 pt-1">
-        <Button
-          type="button"
-          variant="outline"
-          className="flex-1"
-          onClick={onBack}
-          disabled={isLoading}
-        >
-          ← Back
-        </Button>
+        {onBack && (
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onBack}
+            disabled={isLoading}
+          >
+            ← Back
+          </Button>
+        )}
         <Button type="submit" className="flex-1" disabled={isLoading}>
           {isLoading ? "Connecting store…" : "Complete Setup"}
         </Button>

@@ -1,4 +1,4 @@
-import { BotMessageSquare } from "lucide-react";
+import { Bot } from "lucide-react";
 
 interface Stat {
   value: string;
@@ -19,15 +19,19 @@ const DEFAULT_STATS: Stat[] = [
 
 export function AuthBrandingPanel({
   quote = "Set up once, automate forever. Your AI support agent never sleeps.",
-  tagline = "Join store owners using WooChat to handle orders, FAQs, and product queries automatically — 24/7.",
+  tagline = "Join store owners using StoreChat to handle orders, FAQs, and product queries automatically — 24/7.",
   stats = DEFAULT_STATS,
 }: AuthBrandingPanelProps) {
   return (
     <div className="hidden lg:flex flex-col justify-between bg-primary p-10 text-primary-foreground">
       {/* Logo */}
       <div className="flex items-center gap-2.5">
-        <BotMessageSquare className="h-7 w-7" />
-        <span className="text-lg font-semibold tracking-tight">WooChat</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-linear-to-br from-emerald-400 to-blue-500">
+          <Bot className="h-4 w-4 text-white" />
+        </div>
+        <span className="font-serif text-xl font-normal tracking-tight text-slate-100">
+          StoreChat
+        </span>
       </div>
 
       {/* Quote / value prop */}

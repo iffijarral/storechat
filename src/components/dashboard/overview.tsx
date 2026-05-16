@@ -1,6 +1,6 @@
-import { StatsGrid } from "@/components/dashboard/stats-grid";
+import { StatsGrid } from "@/components/dashboard/stats-grid/StatsGrid";
 import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
-import { RecentConversations } from "@/components/dashboard/recent-conversations";
+import { RecentConversations } from "@/components/dashboard/conversations/RecentConversations";
 
 export function DashboardOverview() {
   return (

@@ -14,7 +14,7 @@ export default function RegisterPage() {
       {/* ── Left panel: branding ────────────────────────────────────────── */}
       <AuthBrandingPanel
         quote="Set up once, automate forever. Your AI support agent never sleeps."
-        tagline="Join store owners using WooChat to handle orders, FAQs, and product queries automatically — 24/7."
+        tagline="Join store owners using StoreChat to handle orders, FAQs, and product queries automatically — 24/7."
         stats={[
           { value: "2 min", label: "Setup time" },
           { value: "24/7", label: "AI availability" },
@@ -27,7 +27,7 @@ export default function RegisterPage() {
           {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <BotMessageSquare className="h-6 w-6 text-primary" />
-            <span className="text-base font-semibold">WooChat</span>
+            <span className="text-base font-semibold">StoreChat</span>
           </div>
 
           <RegisterForm />

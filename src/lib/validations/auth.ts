@@ -59,9 +59,24 @@ export const passwordChangeSchema = z
     path: ["new_password"],
   });
 
+  export const forgotPasswordSchema = z.object({
+    email: z.string().email("Invalid email address"),
+  });
+
+  export const resetPasswordSchema = z
+  .object({
+    newPassword: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 
 // Automated Type Inference
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type AccountStepValues = z.infer<typeof accountStepSchema>;
-export type PasswordUpdateFormValues = z.infer<typeof passwordChangeSchema>;
+export type PasswordChangeValues = z.infer<typeof passwordChangeSchema>;
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

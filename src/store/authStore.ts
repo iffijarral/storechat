@@ -15,11 +15,13 @@ type Store = {
   id: string;        // DB UUID
   store_id: string;  // public identifier (used in API)
   store_name?: string;
+  store_url?: string;
 };
 
 type AuthState = {
   user: UserResponse | null;
   token: string | null;
+  refreshToken: string | null;
 
   stores: Store[];
   activeStoreId: string | null;
@@ -27,13 +29,19 @@ type AuthState = {
   isLoading: boolean;
   error: string | null;
 
+  hasHydrated: boolean;
+  
+
   // actions
   setUser: (user: UserResponse | null) => void;
   setActiveStore: (storeId: string) => void;
-  logout: () => void;
-
-  login: (data: LoginRequest) => Promise<void>;
+  setStores: (stores: Store[]) => void;
+  setHasHydrated: (value: boolean) => void;
+  refreshAccessToken: () => Promise<boolean>;
+  
   register: (data: AccountStepValues) => Promise<void>;
+  login: (data: LoginRequest) => Promise<void>;
+  logout: () => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -41,12 +49,16 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
+      refreshToken: null,
 
       stores: [],
       activeStoreId: null,
 
       isLoading: false,
       error: null,
+
+      hasHydrated: false,
+      setHasHydrated: (value) => set({ hasHydrated: value }),
 
       // ✅ simple setter
       setUser: (user) => set({ user }),
@@ -55,12 +67,14 @@ export const useAuthStore = create<AuthState>()(
       setActiveStore: (storeId) => {
         set({ activeStoreId: storeId });
       },
+      setStores: (stores) => set({ stores }),
 
       // ✅ clean reset
       logout: () => {
         set({
           user: null,
           token: null,
+          refreshToken: null,
           stores: [],
           activeStoreId: null,
           error: null,
@@ -74,7 +88,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const res = await api.post<TokenResponse>("/auth/login", data);
 
-          const { access_token, user } = res.data;
+          const { access_token, refresh_token, user } = res.data;
 
           const stores = user?.stores || [];
 
@@ -83,6 +97,7 @@ export const useAuthStore = create<AuthState>()(
           console.log("Active Store ID:", activeStoreId); // Debug log
           set({
             token: access_token,
+            refreshToken: refresh_token,
             user,
             stores,
             activeStoreId,
@@ -94,6 +109,22 @@ export const useAuthStore = create<AuthState>()(
           throw err; // 🔥 important for UI / hooks
         } finally {
           set({ isLoading: false });
+        }
+      },
+      refreshAccessToken: async () => {
+        const refreshToken = useAuthStore.getState().refreshToken;
+        if (!refreshToken) return false;
+
+        try {
+          const res = await api.post("/auth/refresh", {
+            refresh_token: refreshToken,
+          });
+          set({ token: res.data.access_token });
+          return true;
+        } catch {
+          // Refresh failed — log out
+          useAuthStore.getState().logout();
+          return false;
         }
       },
 
@@ -139,6 +170,9 @@ export const useAuthStore = create<AuthState>()(
         stores: state.stores,
         activeStoreId: state.activeStoreId,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      }
     }
   )
 );

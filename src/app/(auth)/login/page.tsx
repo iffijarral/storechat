@@ -31,7 +31,6 @@ export default function LoginPage() {
             <BotMessageSquare className="h-6 w-6 text-primary" />
             <span className="text-base font-semibold">WooChat</span>
           </div>
-
           <LoginForm />
         </div>
       </div>
